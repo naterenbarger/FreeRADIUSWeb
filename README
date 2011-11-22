@@ -1,0 +1,8 @@
+#######################################################
+#                                                     #
+#       RadiusWeb is a php web interface used to      #
+#       parse the accounting log from the MySQL       #
+#       database of the FreeRADIUS server.            #
+#                                                     #
+#######################################################
+
