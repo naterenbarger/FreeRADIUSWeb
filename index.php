@@ -63,7 +63,7 @@ elseif (isset($_REQUEST['nasid'])) {
 }
 
 else {
-  $query  = "SELECT * FROM radpostauth WHERE date LIKE \"".date("Y-m-d")."%\" ORDER BY date DESC ";
+  $query  = "SELECT * FROM radpostauth WHERE date > DATE_ADD(NOW(), INTERVAL -10 MINUTE) ORDER BY date DESC ";
 }
 
     $result = mysql_query($query);
