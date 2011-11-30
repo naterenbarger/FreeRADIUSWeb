@@ -13,13 +13,28 @@ if (!isset($_POST['submit']))
     <title>Radius Log</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script type="text/javascript" src="config/datepick.js"></script>
-  </head>
+    <link rel="stylesheet" type="text/css" href="config/anytime.css" />
+    <script type="text/javascript" src="config/jquery.js"></script>
+    <script type="text/javascript" src="config/anytime.js"></script>
+</head>
   <body>
     <h1> Radius Log </h1>
 <form method="post" action="<?php echo $post; ?>">
-Start Date (yyyy-mm-dd): <input type="text" name="sdate"><input type=button value="select" onclick="displayDatePicker('sdate', false, 'ymd', '-');"><input type="submit" name="submit" value="Submit">
-</form><br>
+Start Date and Time (yyyy-mm-dd hh:MM:ss): <input type="text" id="sdate" name="sdate">
+<br>
+End Date and Time (yyyy-mm-dd hh:MM:ss): <input type="text" id="edate" name="edate">
+<br>
+User: <input type="text" id="username" name="username">
+<br>
+<input type="submit" name="submit" value="Submit">
+</form>
+<script>
+  $("#sdate").AnyTime_picker(
+    { format: "%Y-%m-%d %H:%i:%s" } );
+  $("#edate").AnyTime_picker(
+    { format: "%Y-%m-%d %H:%i:%s" } );
+</script>  
+<br>
 <br>
     <table class="table">
       <tr>
@@ -63,7 +78,8 @@ elseif (isset($_REQUEST['nasid'])) {
 }
 
 else {
-  $query  = "SELECT * FROM radpostauth WHERE date > DATE_ADD(NOW(), INTERVAL -10 MINUTE) ORDER BY date DESC ";
+  #$query = "SELECT * FROM radpostauth WHERE date > DATE_ADD(NOW(), INTERVAL -10 MINUTE) ORDER BY date DESC ";
+  $query = "SELECT * FROM radpostauth ORDER BY id DESC LIMIT 500";
 }
 
     $result = mysql_query($query);
@@ -94,8 +110,8 @@ else {
 
 } else {
 $sdate = $_POST["sdate"];
-//$edate = $_POST["edate"];
-
+$edate = $_POST["edate"];
+$username = $_POST["username"];
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dli">
@@ -104,13 +120,27 @@ $sdate = $_POST["sdate"];
     <title>Radius Log</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script type="text/javascript" src="config/datepick.js"></script>
+    <link rel="stylesheet" type="text/css" href="config/anytime.css" />
+    <script type="text/javascript" src="config/jquery.js"></script>
+    <script type="text/javascript" src="config/anytime.js"></script>
   </head>
   <body>
     <h1> Radius Log </h1>
-<form method="post" action="<?php echo $post;?>">
-Start Date (yyyy-mm-dd): <input type="text" name="sdate"><input type=button value="select" onclick="displayDatePicker('sdate', false, 'ymd', '-');"><input type="submit" name="submit" value="Submit">
+<form method="post" action="<?php echo $post; ?>">
+Start Date and Time (yyyy-mm-dd hh:MM:ss): <input type="text" id="sdate" name="sdate">
+<br>
+End Date and Time (yyyy-mm-dd hh:MM:ss): <input type="text" id="edate" name="edate">
+<br>
+User: <input type="text" id="user" name="user">
+<br>
+<input type="submit" name="submit" value="Submit">
 </form>
+<script>
+  $("#sdate").AnyTime_picker(
+    { format: "%Y-%m-%d %H:%i:%s" } );
+  $("#edate").AnyTime_picker(
+    { format: "%Y-%m-%d %H:%i:%s" } );
+</script>  
 <br>
 <br>
     <table class="table">
@@ -126,7 +156,11 @@ Start Date (yyyy-mm-dd): <input type="text" name="sdate"><input type=button valu
       </tr>
 <?php
 
-if (isset($_REQUEST['user'])) {
+if ($username != "") {
+  $query="SELECT * FROM radpostauth WHERE user=\"".$username."\" ORDER BY date DESC LIMIT 50";
+}
+
+elseif (isset($_REQUEST['user'])) {
   $query="SELECT * FROM radpostauth WHERE user=\"".$_REQUEST['user']."\" ORDER BY date DESC ";
 }
 
@@ -155,7 +189,7 @@ elseif (isset($_REQUEST['nasid'])) {
 }
 
 else {
-  $query  = "SELECT * FROM radpostauth WHERE date LIKE \"".$sdate."%\" ORDER BY date DESC ";
+  $query  = "SELECT * FROM radpostauth WHERE date >= \"".$sdate."\" AND date <= \"".$edate."\" ORDER BY date DESC ";
 }
 
     $result = mysql_query($query);
